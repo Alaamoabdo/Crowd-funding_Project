@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Register | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<main class="register-layout">
+  <section class="register-intro" aria-labelledby="register-title">
+    <span class="eyebrow">NEXT STEP</span>
+    <h1 id="register-title">Give your ideas room to become real.</h1>
+    <p>Join a growing community that backs thoughtful projects and turns local ambition into action.</p>
+    <div class="intro-rule"></div>
+    <p class="intro-note"><strong>Built in Egypt.</strong><br>Powered by people with the courage to begin.</p>
+  </section>
+
+  <section class="register-card">
+    <div class="card-heading">
+      <span class="card-kicker">Get started</span>
+      <h2>Create your account</h2>
+      <p>It takes less than a minute. Your details stay private.</p>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="register-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="form-field field-{{ field.name }}">
+          <label for="{{ field.id_for_label }}">{{ field.label }}{{ field }}</label>
+          {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button type="submit">Create account <span aria-hidden="true">&rarr;</span></button>
+    </form>
+    <p class="form-footer">Already activated your account? <a href="{% url 'accounts:login' %}">Login</a></p>
+  </section>
+</main>
+{% endblock %}

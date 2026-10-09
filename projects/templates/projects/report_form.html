@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Report {{ report_type }} | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="form-page report-page">
+  <span class="eyebrow">SAFETY &amp; MODERATION</span>
+  <h1>Report {{ report_type }}</h1>
+  {% if report_type == 'Project' %}
+    <p class="report-target"><strong>Project:</strong> {{ reported_object.title }}</p>
+  {% else %}
+    <div class="report-target">
+      <strong>Comment by {{ reported_object.author.get_full_name|default:reported_object.author.email }}</strong>
+      <p>{{ reported_object.body }}</p>
+    </div>
+  {% endif %}
+  <form method="post" class="project-form report-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-field">
+      <label for="{{ form.reason.id_for_label }}">Reason for report</label>
+      {{ form.reason }}
+      {{ form.reason.errors }}
+    </div>
+    <div class="report-actions">
+      <button type="submit">Submit Report</button>
+      <a class="button-link secondary-button" href="{{ cancel_url }}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

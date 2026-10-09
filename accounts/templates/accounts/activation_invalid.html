@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Activation link expired | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<h1>Activation link is unavailable</h1>
+<p>This link is invalid or has expired. Please register again to receive a new one.</p>
+<a href="{% url 'accounts:register' %}">Register again</a>
+{% endblock %}

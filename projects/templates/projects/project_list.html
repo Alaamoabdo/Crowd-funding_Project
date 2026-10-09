@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Discover projects | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="projects-page">
+  <div class="page-heading"><div><span class="eyebrow">MAKE AN IMPACT</span><h1>Projects worth backing.</h1></div><a class="button-link" href="{% url 'projects:create' %}">Start a project &rarr;</a></div>
+  <div class="slider-shell">
+    <div class="featured-slider" data-project-list-slider>
+      {% for project in projects %}
+        {% include 'projects/project_card.html' with project=project %}
+      {% empty %}
+        <p>No projects are available yet.</p>
+      {% endfor %}
+    </div>
+    <button class="slider-control slider-prev" type="button" data-project-list-prev aria-label="Previous project">&#8592;</button>
+    <button class="slider-control slider-next" type="button" data-project-list-next aria-label="Next project">&#8594;</button>
+  </div>
+</section>
+<script>
+  const projectListSlider = document.querySelector('[data-project-list-slider]');
+  const projectListPrev = document.querySelector('[data-project-list-prev]');
+  const projectListNext = document.querySelector('[data-project-list-next]');
+
+  if (projectListSlider && projectListPrev && projectListNext) {
+    const moveProjectListSlider = (direction) => {
+      projectListSlider.scrollBy({ left: direction * projectListSlider.clientWidth * 0.9, behavior: 'smooth' });
+    };
+
+    projectListPrev.addEventListener('click', () => moveProjectListSlider(-1));
+    projectListNext.addEventListener('click', () => moveProjectListSlider(1));
+  }
+</script>
+{% endblock %}

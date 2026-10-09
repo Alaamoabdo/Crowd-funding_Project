@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}My profile | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<main class="profile-layout">
+  <section class="profile-intro">
+    <span class="eyebrow">YOUR ACCOUNT</span>
+    <h1>Your profile.</h1>
+    <p>Review your account information and personal details.</p>
+  </section>
+
+  <section class="profile-card" id="profile-details">
+    <div class="card-heading">
+      <span class="card-kicker">Profile details</span>
+      <h2>Personal information</h2>
+    </div>
+    <div class="profile-photo-wrap">
+      {% if user.profile_picture %}
+        <img class="profile-avatar" src="{{ user.profile_picture.url }}" alt="Profile picture for {{ user.get_full_name|default:user.email }}">
+      {% else %}
+        <div class="profile-avatar profile-avatar-empty" aria-hidden="true">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+      {% endif %}
+      <span>Profile picture</span>
+    </div>
+    <div class="profile-data">
+      <div class="profile-data-row"><span>First name</span><strong>{{ user.first_name }}</strong></div>
+      <div class="profile-data-row"><span>Last name</span><strong>{{ user.last_name }}</strong></div>
+      <div class="profile-data-row"><span>Email address</span><strong>{{ user.email }}</strong></div>
+      <div class="profile-data-row"><span>Mobile phone</span><strong>{{ user.mobile_phone }}</strong></div>
+      <div class="profile-data-row profile-data-optional"><span>Birthdate</span><strong>{% if user.birthdate %}{{ user.birthdate|date:'d M, Y' }}{% else %}Not provided{% endif %}</strong></div>
+      <div class="profile-data-row profile-data-optional"><span>Facebook Profile</span><strong>{% if user.facebook_profile %}<a href="{{ user.facebook_profile }}" target="_blank" rel="noopener">View profile</a>{% else %}Not provided{% endif %}</strong></div>
+      <div class="profile-data-row profile-data-optional"><span>Country</span><strong>{% if user.country %}{{ user.country }}{% else %}Not provided{% endif %}</strong></div>
+    </div>
+    <div class="profile-actions"><a class="button-link" href="{% url 'accounts:edit_profile' %}">Edit Profile</a><a class="text-button danger-link" href="{% url 'accounts:delete_account' %}">Delete account</a></div>
+    <p class="form-footer"><a href="{% url 'accounts:dashboard' %}">Back to dashboard</a></p>
+  </section>
+</main>
+<section class="profile-history">
+  <div class="history-column" id="my-projects">
+    <span class="eyebrow">My projects</span>
+    <h2>Projects you created</h2>
+    <div class="history-list">
+      {% for project in my_projects %}
+        <a class="history-item" href="{{ project.get_absolute_url }}">
+          <div>
+            <strong>{{ project.title }}</strong>
+            <small>{{ project.category.name }}</small>
+          </div>
+          <span class="history-badge">{{ project.status|title }}</span>
+        </a>
+      {% empty %}
+        <p class="history-empty">You have not created any project yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="history-column" id="donations">
+    <span class="eyebrow">My donations</span>
+    <h2>Projects you backed</h2>
+    <div class="history-list">
+      {% for donation in my_donations %}
+        <a class="history-item donation-item" href="{{ donation.project.get_absolute_url }}">
+          <div>
+            <strong>{{ donation.project.title }}</strong>
+            <small>Contribution</small>
+          </div>
+          <span class="history-badge donation-badge">{{ donation.amount|floatformat:2 }} EGP</span>
+        </a>
+      {% empty %}
+        <p class="history-empty">You have not donated to any project yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

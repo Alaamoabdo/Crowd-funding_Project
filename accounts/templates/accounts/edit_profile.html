@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Edit profile | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="form-page">
+  <span class="eyebrow">YOUR ACCOUNT</span>
+  <h1>Edit Profile</h1>
+  <p>Update your personal information. Your email is kept unchanged for login.</p>
+  <form method="post" enctype="multipart/form-data" class="project-form profile-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="form-field field-{{ field.name }}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <button type="submit">Save Changes <span aria-hidden="true">&rarr;</span></button>
+    <a class="button-link secondary-button" href="{% url 'accounts:profile' %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

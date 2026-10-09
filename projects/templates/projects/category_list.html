@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Categories | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="category-page"><span class="eyebrow">EXPLORE</span><h1>Choose a category.</h1><p>Find projects connected to the causes you care about.</p><div class="category-grid">{% for category in categories %}<a class="category-link" href="{% url 'projects:category' category.slug %}"><span>{{ category.name }}</span><strong>{{ category.projects.count }} projects &rarr;</strong></a>{% empty %}<p>No categories have been added yet.</p>{% endfor %}</div></section>
+{% endblock %}

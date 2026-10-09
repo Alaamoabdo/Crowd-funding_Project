@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Crowdfunding Egypt{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <div class="site-shell">
+    <nav class="site-nav">
+      <a class="nav-brand" href="{% url 'projects:home' %}"><strong>Crowdfunding Egypt</strong></a>
+      <div class="nav-links">
+        <a href="{% url 'projects:home' %}">Home</a>
+        <a href="{% url 'projects:list' %}">Projects</a>
+        <a href="{% url 'projects:categories' %}">Categories</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:profile' %}">Profile</a>
+          <a class="nav-primary" href="{% url 'projects:create' %}">Create Project</a>
+          <a href="{% url 'accounts:logout' %}">Logout</a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}">Login</a>
+          <a class="nav-primary" href="{% url 'accounts:register' %}">Register</a>
+        {% endif %}
+      </div>
+    </nav>
+    {% for message in messages %}<p class="message {{ message.tags }}">{{ message }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+    <footer><span>&copy; {% now "Y" %} Crowdfunding Egypt</span><a href="{% url 'projects:home' %}">Back to Home</a></footer>
+  </div>
+</body>
+</html>

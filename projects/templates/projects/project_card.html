@@ -1,0 +1,14 @@
+<article class="project-tile home-project-card">
+  {% with image=project.images.first %}{% if image %}<img src="{{ image.image.url }}" alt="{{ project.title }}">{% else %}<div class="image-placeholder">No image yet</div>{% endif %}{% endwith %}
+  <div class="tile-body">
+    <span class="tile-category">{{ project.category.name }}</span>
+    <h2><a href="{{ project.get_absolute_url }}">{{ project.title }}</a></h2>
+    <p>{{ project.details|truncatewords:16 }}</p>
+    <div class="progress"><span style="width: {{ project.progress_percent }}%"></span></div>
+    <div class="tile-meta"><span>{{ project.total_donations|floatformat:0 }} EGP raised</span><span>{{ project.average_score|default:project.average_rating|floatformat:1 }}★</span></div>
+    <div class="card-actions">
+      <a class="card-action" href="{{ project.get_absolute_url }}">View project &rarr;</a>
+      <a class="card-action donate-action" href="{{ project.get_absolute_url }}">Donate now</a>
+    </div>
+  </div>
+</article>

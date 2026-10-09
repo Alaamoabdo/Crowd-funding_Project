@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.title }} | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<article class="project-detail">
+  <header class="detail-header"><div><span class="tile-category">{{ project.category.name }}</span><h1>{{ project.title }}</h1><p>Created by {{ project.creator.get_full_name|default:project.creator.email }}</p></div><div class="rating-summary"><strong>{{ project.average_score|default:project.average_rating|floatformat:1 }}</strong><span>/ 5 rating</span></div></header>
+  <div class="detail-layout">
+    <section>
+      <div class="detail-slider-wrap">
+        {% if project.images.exists %}
+          <div class="image-counter" data-image-counter>1 / {{ project.images.count }}</div>
+          <button class="slider-control slider-prev" type="button" data-project-slider-prev aria-label="Previous project image">&#8592;</button>
+          <button class="slider-control slider-next" type="button" data-project-slider-next aria-label="Next project image">&#8594;</button>
+        {% endif %}
+        <div class="project-slider" data-project-slider>{% for image in project.images.all %}<img src="{{ image.image.url }}" alt="{{ image.caption|default:project.title }}">{% empty %}<div class="image-placeholder">The project gallery will appear here.</div>{% endfor %}</div>
+      </div>
+      <div class="detail-copy"><h2>About the project</h2><p>{{ project.details|linebreaksbr }}</p><div class="tag-list">{% for tag in project.tags.all %}<span>#{{ tag.name }}</span>{% endfor %}</div></div>
+      <section class="comments">
+        <div class="comments-heading"><div><span class="eyebrow">Join the conversation</span><h2>Comments</h2></div><span class="comments-count">{{ project.comments.count }} contributions</span></div>
+        <div class="comment-list">
+          {% for comment in project.comments.all %}
+            {% if not comment.parent_id %}
+              <article class="comment-thread">
+                <div class="comment">
+                  <div class="comment-header"><div class="comment-avatar">{{ comment.author.first_name|first|default:comment.author.email|first|upper }}</div><div><strong>{{ comment.author.get_full_name|default:comment.author.email }}</strong><small>{{ comment.created_at|date:'d M, Y' }}</small></div></div>
+                  <p>{{ comment.body }}</p>
+                  <div class="comment-actions"><button class="text-button reply-toggle" type="button" data-reply-toggle="reply-form-{{ comment.pk }}" aria-expanded="false">Reply</button><a class="text-button report-button" href="{% url 'projects:report_comment' comment.pk %}">Report</a></div>
+                  {% if user.is_authenticated %}<form method="post" action="{% url 'projects:reply' comment.pk %}" class="reply-form" id="reply-form-{{ comment.pk }}" hidden>{% csrf_token %}{{ comment_form.body }}<button type="submit">Add reply</button></form>{% endif %}
+                </div>
+                {% for reply in comment.replies.all %}<div class="comment comment-reply"><div class="comment-header"><div class="comment-avatar">{{ reply.author.first_name|first|default:reply.author.email|first|upper }}</div><div><strong>{{ reply.author.get_full_name|default:reply.author.email }}</strong><small>{{ reply.created_at|date:'d M, Y' }}</small></div></div><p>{{ reply.body }}</p><div class="comment-actions"><a class="text-button report-button" href="{% url 'projects:report_comment' reply.pk %}">Report</a></div></div>{% endfor %}
+              </article>
+            {% endif %}
+          {% empty %}<p class="comments-empty">Be the first to start the conversation.</p>{% endfor %}
+        </div>
+      </section>
+      {% if user.is_authenticated %}<form method="post" action="{% url 'projects:comment' project.pk %}" class="inline-form comment-composer">{% csrf_token %}<label for="id_body">Add to the conversation</label>{{ comment_form.body }}<button type="submit">Add comment</button></form>{% endif %}
+    </section>
+    <aside class="support-panel">
+      <div class="raised"><strong>{{ project.total_donations|floatformat:2 }} EGP</strong><span>raised out of {{ project.target|floatformat:2 }} EGP</span></div>
+      <div class="progress"><span style="width: {{ project.progress_percent }}%"></span></div>
+      <p>{{ project.progress_percent }}% funded &middot; ends {{ project.end_time|date:'d M, Y H:i' }}</p>
+
+      {% if user.is_authenticated and project.status == 'active' %}
+        <div class="donation-box">
+          <h3>Support this project</h3>
+          <form method="post" action="{% url 'projects:donate' project.pk %}">
+            {% csrf_token %}
+            {{ donation_form.as_p }}
+            <button class="primary-donation-button" type="submit">Donate now</button>
+          </form>
+        </div>
+      {% elif not user.is_authenticated %}
+        <a class="button-link full-button large-button" href="{% url 'accounts:login' %}?next={{ request.path }}">Log in to donate</a>
+      {% else %}
+        <p class="donation-closed">This campaign is not accepting donations right now.</p>
+      {% endif %}
+
+      <hr>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'projects:rate' project.pk %}" class="rating-form">
+          {% csrf_token %}
+          <h3>Rate this project</h3>
+          {{ rating_form.score }}
+          <button type="submit">Save rating</button>
+        </form>
+        <a class="text-button report-button report-project-link" href="{% url 'projects:report' project.pk %}">Report project</a>
+      {% endif %}
+      {% if user == project.creator and project.can_cancel %}
+        <form method="post" action="{% url 'projects:cancel' project.pk %}">
+          {% csrf_token %}
+          <button class="cancel-button" type="submit">Cancel campaign</button>
+        </form>
+      {% endif %}
+    </aside>
+  </div>
+</article>
+<section class="similar-projects"><h2>Similar projects</h2><div class="project-grid">{% for similar in similar_projects %}<article class="project-tile"><div class="tile-body"><span class="tile-category">{{ similar.category.name }}</span><h2><a href="{{ similar.get_absolute_url }}">{{ similar.title }}</a></h2><p>{{ similar.details|truncatewords:14 }}</p></div></article>{% empty %}<p>No similar projects yet.</p>{% endfor %}</div></section>
+<script>
+  const detailSlider = document.querySelector('[data-project-slider]');
+  const detailPrev = document.querySelector('[data-project-slider-prev]');
+  const detailNext = document.querySelector('[data-project-slider-next]');
+  const imageCounter = document.querySelector('[data-image-counter]');
+
+  if (detailSlider && detailPrev && detailNext) {
+    const updateCounter = () => {
+      const total = detailSlider.children.length;
+      const currentIndex = Math.round(detailSlider.scrollLeft / detailSlider.clientWidth) + 1;
+      if (imageCounter) {
+        imageCounter.textContent = `${currentIndex} / ${total}`;
+      }
+    };
+
+    const moveDetailSlider = (direction) => {
+      const imageWidth = detailSlider.clientWidth;
+      detailSlider.scrollBy({ left: direction * imageWidth, behavior: 'smooth' });
+      setTimeout(updateCounter, 150);
+    };
+
+    detailPrev.addEventListener('click', () => moveDetailSlider(-1));
+    detailNext.addEventListener('click', () => moveDetailSlider(1));
+    detailSlider.addEventListener('scroll', updateCounter, { passive: true });
+    updateCounter();
+  }
+</script>
+<script>
+  document.querySelectorAll('[data-reply-toggle]').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const form = document.getElementById(toggle.dataset.replyToggle);
+      if (form) {
+        form.hidden = !form.hidden;
+        toggle.setAttribute('aria-expanded', String(!form.hidden));
+        if (!form.hidden) form.querySelector('textarea').focus();
+      }
+    });
+  });
+</script>
+{% endblock %}

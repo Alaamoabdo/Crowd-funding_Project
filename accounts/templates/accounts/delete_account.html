@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Delete account | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="danger-page">
+  <span class="eyebrow">ACCOUNT SETTINGS</span>
+  <h1>Delete your account?</h1>
+  <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+  <form method="post" class="confirmation-actions">
+    {% csrf_token %}
+    <div class="form-field">
+      <label for="{{ form.password.id_for_label }}">Current password</label>
+      {{ form.password }}
+      {{ form.password.errors }}
+    </div>
+    <button type="submit" name="confirm" value="yes" class="cancel-button">Yes, delete my account</button>
+    <a class="button-link secondary-button" href="{% url 'accounts:profile' %}">Keep my account</a>
+  </form>
+</section>
+{% endblock %}

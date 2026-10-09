@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Crowdfunding Egypt | Fund ideas that matter{% endblock %}
+{% block body_class %}home-body{% endblock %}
+{% block content %}
+<main class="home-page">
+  <section class="home-hero">
+    <div><span class="eyebrow">CROWDFUNDING EGYPT</span><h1>Small starts.<br><em>Real impact.</em></h1><p>Discover live projects built by people with something worth bringing to life.</p></div>
+    <form class="search-form" method="get" action="{% url 'projects:home' %}"><label for="project-search">Find a project</label><div><input id="project-search" type="search" name="q" value="{{ search_query }}" placeholder="Search by title or tag"><button type="submit">Search</button></div></form>
+  </section>
+
+  {% if search_query %}<section class="home-section search-section"><div class="section-heading"><div><span class="eyebrow">SEARCH RESULTS</span><h2>Results for “{{ search_query }}”</h2></div><a href="{% url 'projects:home' %}">Clear search</a></div><div class="project-grid">{% for project in search_results %}{% include 'projects/project_card.html' with project=project %}{% empty %}<p>No running projects matched your search.</p>{% endfor %}</div></section>{% endif %}
+
+  <section class="home-section top-rated-section"><div class="section-heading"><div><span class="eyebrow">BACKED BY THE CROWD</span><h2>Projects people love.</h2></div><span class="section-note">Top 5 running projects by rating</span></div><div class="slider-shell"><div class="featured-slider" data-slider>{% for project in top_rated_projects %}{% include 'projects/project_card.html' with project=project %}{% empty %}<p>No running projects are available yet.</p>{% endfor %}</div><button class="slider-control slider-prev" type="button" data-slider-prev aria-label="Previous project">&#8592;</button><button class="slider-control slider-next" type="button" data-slider-next aria-label="Next project">&#8594;</button></div></section>
+
+  <section class="home-section"><div class="section-heading"><div><span class="eyebrow">JUST IN</span><h2>Latest projects.</h2></div><a href="{% url 'projects:list' %}">View all &rarr;</a></div><div class="slider-shell"><div class="featured-slider" data-slider-latest>{% for project in latest_projects %}{% include 'projects/project_card.html' with project=project %}{% empty %}<p>No projects are available yet.</p>{% endfor %}</div><button class="slider-control slider-prev" type="button" data-slider-prev-latest aria-label="Previous latest project">&#8592;</button><button class="slider-control slider-next" type="button" data-slider-next-latest aria-label="Next latest project">&#8594;</button></div></section>
+
+  <section class="home-section"><div class="section-heading"><div><span class="eyebrow">HANDPICKED</span><h2>Featured projects.</h2></div></div><div class="slider-shell"><div class="featured-slider" data-slider-featured>{% for project in featured_projects %}{% include 'projects/project_card.html' with project=project %}{% empty %}<p>Featured projects will appear here.</p>{% endfor %}</div><button class="slider-control slider-prev" type="button" data-slider-prev-featured aria-label="Previous featured project">&#8592;</button><button class="slider-control slider-next" type="button" data-slider-next-featured aria-label="Next featured project">&#8594;</button></div></section>
+
+  <section class="home-section category-section"><div class="section-heading"><div><span class="eyebrow">FIND YOUR CAUSE</span><h2>Browse categories.</h2></div></div><div class="category-grid">{% for category in categories %}<a class="category-link" href="{% url 'projects:category' category.slug %}"><span>{{ category.name }}</span><strong>{{ category.projects.count }} projects &rarr;</strong></a>{% empty %}<p>No categories have been added yet.</p>{% endfor %}</div></section>
+</main>
+<script>
+  const sliderConfigs = [
+    {
+      root: document.querySelector('[data-slider]'),
+      prev: document.querySelector('[data-slider-prev]'),
+      next: document.querySelector('[data-slider-next]'),
+    },
+    {
+      root: document.querySelector('[data-slider-latest]'),
+      prev: document.querySelector('[data-slider-prev-latest]'),
+      next: document.querySelector('[data-slider-next-latest]'),
+    },
+    {
+      root: document.querySelector('[data-slider-featured]'),
+      prev: document.querySelector('[data-slider-prev-featured]'),
+      next: document.querySelector('[data-slider-next-featured]'),
+    },
+  ];
+
+  sliderConfigs.forEach(({ root, prev, next }) => {
+    if (!root || !prev || !next) return;
+    const moveSlider = (direction) => {
+      const amount = root.clientWidth * 0.9;
+      root.scrollBy({ left: direction * amount, behavior: 'smooth' });
+    };
+    prev.addEventListener('click', () => moveSlider(-1));
+    next.addEventListener('click', () => moveSlider(1));
+  });
+</script>
+{% endblock %}

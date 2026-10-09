@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} Projects | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="category-page"><span class="eyebrow">Category</span><h1>{{ category.name }}</h1><p>Current projects in this category.</p><div class="project-grid">{% for project in projects %}{% include 'projects/project_card.html' with project=project %}{% empty %}<p>No active projects in this category yet.</p>{% endfor %}</div></section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<h1>Hello, {{ user.first_name|default:user.email }}</h1>
+<p>Your account is active. You can manage your profile or explore projects below.</p>
+<p>
+  <a class="button-link" href="{% url 'accounts:profile' %}">View profile</a>
+  <a class="button-link" href="{% url 'projects:list' %}">View projects</a>
+  <a class="button-link" href="#donations">Donations</a>
+</p>
+<p id="donations"><a class="button-link" href="{% url 'accounts:profile' %}#donations">View my donations</a></p>
+{% endblock %}

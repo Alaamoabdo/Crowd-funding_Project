@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Create project | Crowdfunding Egypt{% endblock %}
+{% block content %}
+<section class="form-page"><span class="eyebrow">YOUR CAMPAIGN</span><h1>Turn the idea into momentum.</h1><p>Give people a strong reason to believe in your project.</p>
+<form method="post" enctype="multipart/form-data" class="project-form">{% csrf_token %}{{ form.non_field_errors }}
+  {% for field in form %}
+    <div class="form-field">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+      {{ field.errors }}
+    </div>
+  {% endfor %}
+  <div class="form-field"><label for="id_images">Project images</label><input id="id_images" type="file" name="images" accept="image/*" multiple><span class="helptext">You can choose more than one image.</span></div>
+  <button type="submit">Publish campaign &rarr;</button>
+</form></section>
+{% endblock %}
